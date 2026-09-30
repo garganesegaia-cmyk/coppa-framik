@@ -77,15 +77,15 @@ font:900 62px Nunito,sans-serif;z-index:9;pointer-events:none;animation:stamp 1.
 .fname.fr{background:var(--fp);color:#0f4b56}
 .fname.tie{background:#fff;color:var(--ink)}
 .fsc{font-size:15px;color:#d9dacd}
-.fgo{background:var(--g);color:#23241f;font-size:19px;font-weight:800;padding:14px 22px;border-radius:12px;box-shadow:0 5px 0 #a85a14;margin-top:6px;animation:fadein .6s 2.4s both}
+.fgo{background:var(--g);color:#23241f;font-size:19px;font-weight:800;padding:14px 22px;border-radius:12px;box-shadow:0 5px 0 #a85a14;margin-top:6px;animation:fadein .6s 5s both}
 .fgo:active{transform:translateY(4px);box-shadow:0 1px 0 #a85a14}
-.bottle{position:fixed;left:6px;bottom:-34px;width:62px;transform-origin:50% 100%;transform:rotate(28deg);pointer-events:none}
-.cork{transform-box:fill-box;transform-origin:center;animation:cork 1.1s cubic-bezier(.2,.6,.4,1) .4s both}
+.bottle{position:fixed;left:10px;bottom:-40px;width:76px;transform-origin:50% 100%;transform:rotate(26deg);pointer-events:none}
+.corkd{position:fixed;width:18px;height:13px;margin:-7px 0 0 -9px;border-radius:4px;background:#d9a066;border:2px solid #8a5a00;z-index:30;pointer-events:none}
+.pop{position:fixed;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:#fff;z-index:29;pointer-events:none}
 .albo li{background:#fff;border-radius:6px;padding:8px 12px;box-shadow:2px 3px 0 rgba(35,36,31,.12);font-size:15px}
 @keyframes drop{from{transform:translateY(-260px) scale(1.5) rotate(-14deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes pop2{from{transform:scale(0) rotate(-2deg)}to{transform:scale(1) rotate(-2deg)}}
 @keyframes fadein{from{opacity:0;transform:translateY(10px)}}
-@keyframes cork{to{transform:translate(120px,-520px) rotate(540deg);opacity:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -132,12 +132,12 @@ font:900 62px Nunito,sans-serif;z-index:9;pointer-events:none;animation:stamp 1.
 
 <div class="fest" id="fest" hidden role="dialog" aria-label="Vincitore dell'anno">
   <canvas id="conf"></canvas>
-  <svg class="bottle" viewBox="0 0 60 160" aria-hidden="true">
-    <rect x="14" y="60" width="32" height="98" rx="10" fill="#2f5a43"/>
-    <rect x="22" y="14" width="16" height="56" fill="#2f5a43"/>
-    <rect x="20" y="14" width="20" height="22" rx="3" fill="#f4c24a"/>
+  <svg class="bottle" id="bottle" viewBox="0 0 60 160" aria-hidden="true">
+    <rect x="14" y="60" width="32" height="98" rx="10" fill="#4c8f6a" stroke="#0e1712" stroke-width="2"/>
+    <rect x="22" y="14" width="16" height="56" fill="#4c8f6a" stroke="#0e1712" stroke-width="2"/>
+    <rect id="foil" x="20" y="14" width="20" height="22" rx="3" fill="#f4c24a" stroke="#8a5a00" stroke-width="2"/>
     <rect x="18" y="100" width="24" height="32" rx="3" fill="#ffe0bd"/>
-    <rect class="cork" x="22" y="2" width="16" height="12" rx="3" fill="#d9a066"/>
+    <path d="M21 68V150" stroke="#fff" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>
   </svg>
   <div class="fbox">
     <svg viewBox="0 0 200 224" role="img" aria-label="Coppa dorata con un cono gelato inciso">
@@ -365,8 +365,21 @@ function party() {
     }
     if (++frames < 420 || ps.length) requestAnimationFrame(tick);
   })();
-  setTimeout(() => shoot(114, H - 112, -1.08, 70, 17, true), 450);
-  [700, 1900, 3200].forEach(t => setTimeout(() => { shoot(0, H, -1.1, 55, 19); shoot(W, H, -2.05, 55, 19); }, t));
+  const fo = $("foil").getBoundingClientRect();
+  const nx = fo.left + fo.width / 2 + 6, ny = fo.top + fo.height / 2 - 16;
+  $("bottle").animate([{ transform: "rotate(26deg)" }, { transform: "rotate(20deg)" }, { transform: "rotate(32deg)" }, { transform: "rotate(21deg)" }, { transform: "rotate(26deg)" }], { duration: 650, delay: 100 });
+  setTimeout(() => {
+    const c = document.createElement("div"); c.className = "corkd"; c.style.left = nx + "px"; c.style.top = ny + "px"; document.body.append(c);
+    c.animate([
+      { transform: "translate(0,0) rotate(0deg)", easing: "cubic-bezier(.15,.7,.4,1)" },
+      { transform: "translate(90px,-380px) rotate(380deg)", offset: .5, easing: "cubic-bezier(.6,0,.9,.6)" },
+      { transform: "translate(180px,140px) rotate(780deg)", opacity: 0 }
+    ], { duration: 1600, fill: "forwards" }).onfinish = () => c.remove();
+    const f = document.createElement("div"); f.className = "pop"; f.style.left = nx + "px"; f.style.top = ny + "px"; document.body.append(f);
+    f.animate([{ transform: "scale(.3)", opacity: .9 }, { transform: "scale(3.4)", opacity: 0 }], { duration: 380 }).onfinish = () => f.remove();
+    [0, 220, 440, 700, 1000].forEach((t, i) => setTimeout(() => shoot(nx, ny, -1.1, 36 - i * 6, 15, true), t));
+  }, 800);
+  [700, 1900, 3200, 4600].forEach(t => setTimeout(() => { shoot(0, H, -1.1, 55, 19); shoot(W, H, -2.05, 55, 19); }, t));
 }
 </script>
 </body>
