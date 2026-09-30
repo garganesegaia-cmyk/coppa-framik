@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coppa Framik</title>
+<meta name="theme-color" content="#fcfcf9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fcfcf9;--dot:#dedfd2;--felt:#2f5a43;--ink:#23241f;--mute:#77786c;
+--g:#e8832a;--gp:#ffe0bd;--f:#2c97a8;--fp:#cbeaef}
+*{box-sizing:border-box;margin:0}
+html{background:var(--bg)}
+body{min-height:100dvh;color:var(--ink);font:600 16px/1.4 Nunito,system-ui,sans-serif;
+background:radial-gradient(var(--dot) 1.3px,transparent 1.6px) 0 0/22px 22px,var(--bg);
+padding:max(20px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom));
+display:flex;flex-direction:column;align-items:center;gap:22px}
+.hand{font-family:'Patrick Hand',cursive;font-weight:400}
+.tag{background:var(--felt);color:#fff;padding:10px 22px;border-radius:6px;margin-top:6px;
+outline:2px dashed rgba(255,255,255,.55);outline-offset:-6px;font-size:26px;transform:rotate(-1.5deg);
+box-shadow:3px 4px 0 rgba(35,36,31,.18)}
+main{width:100%;max-width:440px;display:flex;flex-direction:column;gap:22px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:10px}
+.card{position:relative;border-radius:10px;padding:34px 10px 20px;text-align:center;
+box-shadow:4px 5px 0 rgba(35,36,31,.16);outline:2px dashed rgba(35,36,31,.22);outline-offset:-7px}
+.card.g{background:var(--gp);transform:rotate(-1.6deg);color:#7a3a05}
+.card.f{background:var(--fp);transform:rotate(1.3deg);color:#0f4b56;margin-top:10px}
+.card .n{font-size:26px}
+.card .s{font:900 76px/1 Nunito,sans-serif;margin-top:6px;font-variant-numeric:tabular-nums}
+.card .you{font-size:15px;opacity:.75;min-height:20px}
+.clip{position:absolute;top:-14px;left:50%;margin-left:-10px;width:20px;height:44px}
+.cup{position:absolute;right:-12px;top:-26px;font-size:36px;transform:rotate(14deg);display:none}
+.card.lead .cup{display:block;animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.bump{animation:bump .5s cubic-bezier(.3,1.7,.5,1)}
+.status{text-align:center;color:var(--mute);font-size:14px;min-height:20px}
+.status.err{color:#b3261e}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--f);outline-offset:3px}
+.add{background:var(--felt);color:#fff;font-size:20px;font-weight:800;padding:16px;border-radius:12px;
+box-shadow:0 5px 0 #1d3b2c;transition:transform .1s,box-shadow .1s}
+.add:active{transform:translateY(4px);box-shadow:0 1px 0 #1d3b2c}
+h2{font-size:22px}
+.log{list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.log li{background:#fff;border-radius:6px;padding:9px 12px;display:flex;gap:8px;align-items:center;
+box-shadow:2px 3px 0 rgba(35,36,31,.12);border-left:6px solid var(--c)}
+.log .t{flex:1;font-size:15px}.log small{color:var(--mute);font-weight:600}
+.undo{background:none;text-decoration:underline;color:var(--mute);font-size:14px;padding:4px}
+.empty{color:var(--mute);font-size:15px;padding:6px 2px}
+.scrim{position:fixed;inset:0;background:rgba(35,36,31,.45);display:flex;align-items:flex-end;justify-content:center;z-index:5}
+.scrim[hidden]{display:none}
+.sheet{background:var(--bg);width:100%;max-width:440px;border-radius:18px 18px 0 0;padding:22px 18px max(22px,env(safe-area-inset-bottom));
+display:flex;flex-direction:column;gap:14px;animation:up .28s ease-out}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{flex:1;min-width:60px;padding:11px 8px;border-radius:999px;background:#ecebe2;font-weight:800;font-size:17px}
+.pill[aria-pressed=true]{background:var(--felt);color:#fff}
+.pill.wg[aria-pressed=true]{background:var(--g)}.pill.wf[aria-pressed=true]{background:var(--f)}
+input{font:inherit;width:100%;padding:12px;border-radius:10px;border:2px solid #d6d6c8;background:#fff}
+.sug{font-size:15px;padding:6px 12px;background:#fff;border-radius:999px;border:2px dashed #cfcfc0}
+.who{display:flex;flex-direction:column;gap:12px}
+.stamp{position:fixed;left:50%;top:40%;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;
+border:7px double currentColor;display:flex;align-items:center;justify-content:center;
+font:900 62px Nunito,sans-serif;z-index:9;pointer-events:none;animation:stamp 1.7s both;mix-blend-mode:multiply;background:rgba(255,255,255,.35)}
+@keyframes stamp{0%{opacity:0;transform:scale(2.6) rotate(-32deg)}22%{opacity:1;transform:scale(.9) rotate(-12deg)}32%{transform:scale(1.04) rotate(-12deg)}42%{transform:scale(1) rotate(-12deg)}85%{opacity:1}100%{opacity:0;transform:scale(1) rotate(-12deg)}}
+@keyframes bump{0%{transform:translateY(0)}35%{transform:translateY(8px) scale(.98)}100%{transform:translateY(0)}}
+@keyframes pop{from{transform:scale(0) rotate(-40deg)}to{transform:scale(1) rotate(14deg)}}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="tag hand">Coppa Framik 2026</div>
+<main>
+  <div class="cards">
+    <section class="card g" id="cg"><svg class="clip" viewBox="0 0 20 44" fill="none" stroke="#c7c7bb" stroke-width="3" stroke-linecap="round"><path d="M6 30V9a4 4 0 0 1 8 0v26a7 7 0 0 1-14 0V12"/></svg><span class="cup">🏆</span>
+      <div class="n hand">Gaia</div><div class="s" id="sg">–</div><div class="you hand" id="yg"></div></section>
+    <section class="card f" id="cf"><svg class="clip" viewBox="0 0 20 44" fill="none" stroke="#c7c7bb" stroke-width="3" stroke-linecap="round"><path d="M6 30V9a4 4 0 0 1 8 0v26a7 7 0 0 1-14 0V12"/></svg><span class="cup">🏆</span>
+      <div class="n hand">Francesco</div><div class="s" id="sf">–</div><div class="you hand" id="yf"></div></section>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite">Mi collego…</div>
+  <button class="add" id="open">Aggiungi punti</button>
+  <div>
+    <h2 class="hand">Ultime sfide</h2>
+    <ul class="log" id="log"></ul>
+  </div>
+  <button class="undo" id="swap" style="align-self:center"></button>
+</main>
+
+<div class="scrim" id="idm" hidden><div class="sheet" role="dialog" aria-label="Chi sei?">
+  <h2 class="hand">Chi sei?</h2>
+  <div class="row"><button class="pill wg" data-me="g">Gaia</button><button class="pill wf" data-me="f">Francesco</button></div>
+  <p class="status">Lo ricordo su questo telefono.</p>
+</div></div>
+
+<div class="scrim" id="sh" hidden><div class="sheet" role="dialog" aria-label="Aggiungi punti">
+  <div class="who"><h2 class="hand">Chi ha vinto?</h2>
+    <div class="row"><button class="pill wg" data-w="g" aria-pressed="false">Gaia</button><button class="pill wf" data-w="f" aria-pressed="false">Francesco</button></div></div>
+  <div><h2 class="hand">Quanti punti?</h2>
+    <div class="row" id="pts" style="margin-top:8px"><button class="pill" data-p="1">1</button><button class="pill" data-p="2">2</button><button class="pill" data-p="3">3</button><button class="pill" data-p="5">5</button><button class="pill" data-p="10">10</button></div>
+    <input id="cust" type="number" inputmode="numeric" min="1" max="999" placeholder="Altro numero" style="margin-top:8px"></div>
+  <div><h2 class="hand">Per cosa?</h2>
+    <input id="why" maxlength="40" placeholder="Es. ping pong" style="margin-top:8px">
+    <div class="row" style="margin-top:8px"><button class="sug hand">Ping pong</button><button class="sug hand">Gioco da tavola</button><button class="sug hand">Scommessa</button></div></div>
+  <button class="add" id="go">Timbra!</button>
+  <button class="undo" id="cancel">Annulla</button>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBE2_zYLSc-AYQZLMO-NCJTUCUVmxpnP68",
+  authDomain: "coppa-framik.firebaseapp.com",
+  projectId: "coppa-framik",
+  storageBucket: "coppa-framik.firebasestorage.app",
+  messagingSenderId: "160414945548",
+  appId: "1:160414945548:web:c12e7f03fbc3a3232b3929"
+};
+const ROOM = "f7k2-m9q4-x8p3";   // nome "segreto" del documento: non cambiarlo dopo l'inizio
+const NAME = { g: "Gaia", f: "Francesco" };
+const COL = { g: "var(--g)", f: "var(--f)" };
+const $ = id => document.getElementById(id);
+const ref = doc(getFirestore(initializeApp(firebaseConfig)), "coppa", ROOM);
+
+let me = null, data = { g: 0, f: 0, log: [] }, shown = { g: null, f: null };
+try { me = localStorage.getItem("framik-me"); } catch (e) {}
+
+function say(t, err) { const s = $("status"); s.textContent = t; s.className = "status" + (err ? " err" : ""); }
+
+function count(k, to) {
+  const el = $("s" + k), from = shown[k] ?? to; shown[k] = to;
+  if (from === to) { el.textContent = to; return; }
+  const t0 = performance.now();
+  (function step(t) {
+    const p = Math.min(1, (t - t0) / 600);
+    el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3)));
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+  const c = $("c" + k); c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump");
+}
+
+function render() {
+  count("g", data.g); count("f", data.f);
+  $("cg").classList.toggle("lead", data.g > data.f);
+  $("cf").classList.toggle("lead", data.f > data.g);
+  $("yg").textContent = me === "g" ? "(sei tu)" : "";
+  $("yf").textContent = me === "f" ? "(sei tu)" : "";
+  $("swap").textContent = me ? "Non sei " + NAME[me] + "?" : "";
+  const ul = $("log"); ul.innerHTML = "";
+  const items = data.log.slice(-8).reverse();
+  if (!items.length) ul.innerHTML = '<li class="empty" style="border:0;box-shadow:none;background:none">Ancora nessuna sfida: aggiungi la prima.</li>';
+  items.forEach((e, i) => {
+    const li = document.createElement("li");
+    li.style.setProperty("--c", COL[e.w]);
+    const d = new Date(e.t).toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+    li.innerHTML = '<span class="t"></span>';
+    li.firstChild.textContent = NAME[e.w] + " +" + e.p + (e.m ? " · " + e.m : "");
+    const sm = document.createElement("small"); sm.textContent = d; li.append(sm);
+    if (i === 0) { const b = document.createElement("button"); b.className = "undo"; b.textContent = "Annulla"; b.onclick = undo; li.append(b); }
+    ul.append(li);
+  });
+}
+
+onSnapshot(ref, s => {
+  if (s.exists()) { const d = s.data(); data = { g: d.g || 0, f: d.f || 0, log: d.log || [] }; }
+  say(""); render();
+}, () => say("Non riesco a leggere il punteggio. Controlla le regole di Firestore.", true));
+
+async function save(fn) {
+  try {
+    await runTransaction(ref.firestore, async tx => {
+      const s = await tx.get(ref);
+      const d = s.exists() ? s.data() : { year: 2026, g: 0, f: 0, log: [] };
+      fn(d); tx.set(ref, d);
+    });
+    return true;
+  } catch (e) { say("Non salvato: sei online? Riprova.", true); return false; }
+}
+
+async function undo() {
+  if (!confirm("Annullo l'ultima sfida?")) return;
+  await save(d => { const e = d.log.pop(); if (e) d[e.w] -= e.p; });
+}
+
+// --- chi sei
+function askMe() { $("idm").hidden = false; }
+document.querySelectorAll("[data-me]").forEach(b => b.onclick = () => {
+  me = b.dataset.me; try { localStorage.setItem("framik-me", me); } catch (e) {}
+  $("idm").hidden = true; render();
+});
+$("swap").onclick = askMe;
+if (!me) askMe();
+
+// --- foglio per aggiungere
+let W = null, P = null;
+const sync = () => {
+  document.querySelectorAll("[data-w]").forEach(b => b.setAttribute("aria-pressed", b.dataset.w === W));
+  document.querySelectorAll("[data-p]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p) === String(P)));
+};
+$("open").onclick = () => { W = me; P = null; $("cust").value = ""; $("why").value = ""; sync(); $("sh").hidden = false; };
+$("cancel").onclick = () => $("sh").hidden = true;
+$("sh").onclick = e => { if (e.target.id === "sh") $("sh").hidden = true; };
+document.querySelectorAll("[data-w]").forEach(b => b.onclick = () => { W = b.dataset.w; sync(); });
+document.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { P = +b.dataset.p; $("cust").value = ""; sync(); });
+$("cust").oninput = () => { P = parseInt($("cust").value) || null; sync(); };
+document.querySelectorAll(".sug").forEach(b => b.onclick = () => $("why").value = b.textContent);
+
+$("go").onclick = async () => {
+  if (!W || !P || P < 1 || P > 999) { say("Scegli chi ha vinto e quanti punti.", true); return; }
+  const w = W, p = P, m = $("why").value.trim();
+  $("sh").hidden = true;
+  if (await save(d => { d[w] += p; d.log = [...d.log, { w, p, m, t: Date.now() }].slice(-200); })) {
+    const st = document.createElement("div");
+    st.className = "stamp"; st.textContent = "+" + p; st.style.color = w === "g" ? "var(--g)" : "var(--f)";
+    document.body.append(st); setTimeout(() => st.remove(), 1800);
+  }
+};
+</script>
+</body>
+</html>
